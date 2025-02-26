@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
@@ -13,11 +13,29 @@ export default function Login() {
   const [successMessage, setSuccessMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+
+  return (
+    <Suspense fallback={<div>Chargement...</div>}>
+      <LoginContent 
+        formData={formData} 
+        setFormData={setFormData} 
+        error={error} 
+        setError={setError} 
+        successMessage={successMessage} 
+        setSuccessMessage={setSuccessMessage} 
+        loading={loading} 
+        setLoading={setLoading} 
+        router={router} 
+      />
+    </Suspense>
+  );
+}
+
+function LoginContent({ formData, setFormData, error, setError, successMessage, setSuccessMessage, loading, setLoading, router }) {
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    // Vérifier si l'utilisateur vient de s'inscrire
-    if (searchParams.get('registered') === 'true') {
+    if (searchParams?.get('registered') === 'true') {
       setSuccessMessage('Inscription réussie! Vous pouvez maintenant vous connecter.');
     }
   }, [searchParams]);
@@ -45,7 +63,6 @@ export default function Login() {
         throw new Error(data.error || 'Erreur lors de la connexion');
       }
 
-      // Redirection vers le tableau de bord
       router.push('/dashboard');
     } catch (error) {
       setError(error.message);
