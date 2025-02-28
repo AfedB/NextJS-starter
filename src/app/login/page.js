@@ -1,42 +1,55 @@
-'use client';
+"use client";
 
-import { useState, useEffect, Suspense } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import Link from 'next/link';
+import { useState, useEffect, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
+import {signIn} from "next-auth/react";
 
 export default function Login() {
   const [formData, setFormData] = useState({
-    email: '',
-    password: '',
+    email: "",
+    password: "",
   });
-  const [error, setError] = useState('');
-  const [successMessage, setSuccessMessage] = useState('');
+  const [error, setError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   return (
     <Suspense fallback={<div>Chargement...</div>}>
-      <LoginContent 
-        formData={formData} 
-        setFormData={setFormData} 
-        error={error} 
-        setError={setError} 
-        successMessage={successMessage} 
-        setSuccessMessage={setSuccessMessage} 
-        loading={loading} 
-        setLoading={setLoading} 
-        router={router} 
+      <LoginContent
+        formData={formData}
+        setFormData={setFormData}
+        error={error}
+        setError={setError}
+        successMessage={successMessage}
+        setSuccessMessage={setSuccessMessage}
+        loading={loading}
+        setLoading={setLoading}
+        router={router}
       />
     </Suspense>
   );
 }
 
-function LoginContent({ formData, setFormData, error, setError, successMessage, setSuccessMessage, loading, setLoading, router }) {
+function LoginContent({
+  formData,
+  setFormData,
+  error,
+  setError,
+  successMessage,
+  setSuccessMessage,
+  loading,
+  setLoading,
+  router,
+}) {
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    if (searchParams?.get('registered') === 'true') {
-      setSuccessMessage('Inscription réussie! Vous pouvez maintenant vous connecter.');
+    if (searchParams?.get("registered") === "true") {
+      setSuccessMessage(
+        "Inscription réussie! Vous pouvez maintenant vous connecter."
+      );
     }
   }, [searchParams]);
 
@@ -47,23 +60,23 @@ function LoginContent({ formData, setFormData, error, setError, successMessage, 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError('');
-    setSuccessMessage('');
+    setError("");
+    setSuccessMessage("");
 
     try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Erreur lors de la connexion');
+        throw new Error(data.error || "Erreur lors de la connexion");
       }
 
-      router.push('/dashboard');
+      router.push("/dashboard");
     } catch (error) {
       setError(error.message);
     } finally {
@@ -79,19 +92,16 @@ function LoginContent({ formData, setFormData, error, setError, successMessage, 
             Connexion
           </h2>
         </div>
-
         {error && (
           <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
             {error}
           </div>
         )}
-
         {successMessage && (
           <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
             {successMessage}
           </div>
         )}
-
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="rounded-md shadow-sm space-y-4">
             <div>
@@ -132,19 +142,25 @@ function LoginContent({ formData, setFormData, error, setError, successMessage, 
               disabled={loading}
               className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-blue-300"
             >
-              {loading ? 'Connexion en cours...' : 'Se connecter'}
+              {loading ? "Connexion en cours..." : "Se connecter"}
             </button>
           </div>
 
           <div className="text-center">
             <p className="text-sm text-gray-600">
-              Pas encore de compte?{' '}
-              <Link href="/register" className="font-medium text-blue-600 hover:text-blue-500">
+              Pas encore de compte?{" "}
+              <Link
+                href="/register"
+                className="font-medium text-blue-600 hover:text-blue-500"
+              >
                 S'inscrire
               </Link>
             </p>
           </div>
         </form>
+        <button onClick={() => signIn("google")}>
+          Se connecter avec Google
+        </button>
       </div>
     </div>
   );
