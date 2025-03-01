@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import {signIn} from "next-auth/react";
+import { supabase } from '../../lib/supabase'; // Assurez-vous que ce chemin est correct
 
 export default function Login() {
   const [formData, setFormData] = useState({
@@ -64,23 +64,35 @@ function LoginContent({
     setSuccessMessage("");
 
     try {
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+      // Utilisation de Supabase pour l'authentification par email/mot de passe
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: formData.email,
+        password: formData.password,
       });
 
-      const data = await response.json();
+      if (error) throw error;
 
-      if (!response.ok) {
-        throw new Error(data.error || "Erreur lors de la connexion");
-      }
-
+      // Redirection en cas de succès
       router.push("/dashboard");
     } catch (error) {
-      setError(error.message);
+      setError(error.message || "Erreur lors de la connexion");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/dashboard`
+        }
+      });
+      
+      if (error) throw error;
+    } catch (error) {
+      setError(error.message || "Erreur de connexion avec Google");
     }
   };
 
@@ -146,6 +158,34 @@ function LoginContent({
             </button>
           </div>
 
+          <div className="mt-4">
+            <button
+              type="button"
+              onClick={handleGoogleLogin}
+              className="group relative w-full flex justify-center py-2 px-4 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            >
+              <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
+                <path
+                  fill="#EA4335"
+                  d="M12 5c1.617 0 3.081.607 4.202 1.597L19.147 4.7C17.2 2.966 14.777 2 12 2 8.134 2 4.89 4.112 3.211 7.135l3.034 2.347C7.144 7.057 9.375 5 12 5z"
+                />
+                <path
+                  fill="#4285F4"
+                  d="M23.5 12.5c0-.851-.069-1.668-.218-2.5H12v4.5h6.458c-.274 1.465-1.107 2.708-2.371 3.538l3.027 2.342c1.733-1.602 2.886-3.954 2.886-7.38z"
+                />
+                <path
+                  fill="#FBBC05"
+                  d="M6.245 14.828l-3.034 2.347C4.89 19.888 8.134 22 12 22c2.777 0 5.2-.966 7.147-2.7l-3.027-2.342c-.856.572-1.942.942-3.24 1.017-.693.04-1.364.025-2.88-.025-1.743-.058-2.855-.904-3.755-3.122z"
+                />
+                <path
+                  fill="#34A853"
+                  d="M12 22c2.777 0 5.2-.966 7.147-2.7l-3.027-2.342c-.856.572-1.942.942-3.24 1.017-.693.04-1.364.025-2.88-.025C8.257 17.892 7.145 17.046 6.245 14.828L3.211 17.175C4.89 19.888 8.134 22 12 22z"
+                />
+              </svg>
+              Se connecter avec Google
+            </button>
+          </div>
+
           <div className="text-center">
             <p className="text-sm text-gray-600">
               Pas encore de compte?{" "}
@@ -158,9 +198,6 @@ function LoginContent({
             </p>
           </div>
         </form>
-        <button onClick={() => signIn("google")}>
-          Se connecter avec Google
-        </button>
       </div>
     </div>
   );

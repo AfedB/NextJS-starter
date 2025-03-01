@@ -1,9 +1,11 @@
 import { NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-import { comparePasswords, generateToken } from '@/lib/auth';
-import { setCookie } from 'cookies-next';
+import { createClient } from '@supabase/supabase-js';
+import { cookies } from 'next/headers';
 
-const prisma = new PrismaClient();
+// Initialisation du client Supabase
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 export async function POST(request) {
   try {
@@ -17,43 +19,40 @@ export async function POST(request) {
       );
     }
 
-    // Recherche de l'utilisateur
-    const user = await prisma.user.findUnique({
-      where: { email },
+    // Connexion avec Supabase Auth
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
     });
 
-    if (!user) {
+    if (error) {
+      // Gestion des erreurs d'authentification
       return NextResponse.json(
         { error: 'Identifiants incorrects' },
         { status: 401 }
       );
     }
 
-    // Vérification du mot de passe
-    const passwordMatch = await comparePasswords(password, user.password);
+    const { session, user } = data;
 
-    if (!passwordMatch) {
-      return NextResponse.json(
-        { error: 'Identifiants incorrects' },
-        { status: 401 }
-      );
-    }
-
-    // Génération du token
-    const token = generateToken(user.id);
-    
     // Création de la réponse
     const response = NextResponse.json({ 
       message: 'Connexion réussie',
-      user: { id: user.id, email: user.email, name: user.name }
+      user: { 
+        id: user.id, 
+        email: user.email, 
+        name: user.user_metadata?.name || '' 
+      }
     });
     
-    // Définition du cookie
+    // Définition du cookie de session Supabase
+    // Notez que Supabase gère déjà les cookies de session, mais nous pouvons
+    // également définir notre propre cookie si nécessaire
     response.cookies.set({
-      name: 'auth_token',
-      value: token,
+      name: 'sb-auth-token',
+      value: session.access_token,
       httpOnly: true,
-      maxAge: 60 * 60 * 24 * 7, // 7 jours
+      maxAge: session.expires_in, // Durée de validité du token
       path: '/',
     });
 
@@ -64,7 +63,5 @@ export async function POST(request) {
       { error: 'Erreur lors de la connexion' },
       { status: 500 }
     );
-  } finally {
-    await prisma.$disconnect();
   }
 }

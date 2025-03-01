@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { verifyToken } from '@/lib/auth';
+import { verifyToken } from './src/lib/auth';
 
 export function middleware(request) {
   // Vérifier si le chemin commence par /dashboard ou d'autres routes protégées

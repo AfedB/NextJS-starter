@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { supabase } from '@/lib/supabase';
 
 export default function Dashboard() {
   const [user, setUser] = useState(null);
@@ -9,15 +10,16 @@ export default function Dashboard() {
   const router = useRouter();
 
   useEffect(() => {
-    // Récupération des données utilisateur
+    // Récupération des données utilisateur avec Supabase
     const fetchUserData = async () => {
       try {
-        const response = await fetch('/api/user/me');
-        if (!response.ok) {
+        const { data: { user }, error } = await supabase.auth.getUser();
+        
+        if (error || !user) {
           throw new Error('Non autorisé');
         }
-        const data = await response.json();
-        setUser(data.user);
+        
+        setUser(user);
       } catch (error) {
         console.error('Erreur:', error);
         // Redirection vers la page de connexion si non autorisé
@@ -28,11 +30,26 @@ export default function Dashboard() {
     };
 
     fetchUserData();
+    
+    // Configurer un listener pour les changements d'état d'authentification
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        if (event === 'SIGNED_OUT') {
+          router.push('/login');
+        } else if (event === 'SIGNED_IN' && session) {
+          setUser(session.user);
+        }
+      }
+    );
+
+    // Nettoyage du listener quand le composant est démonté
+    return () => subscription.unsubscribe();
   }, [router]);
 
   const handleLogout = async () => {
     try {
-      await fetch('/api/auth/logout');
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
       router.push('/login');
     } catch (error) {
       console.error('Erreur de déconnexion:', error);
@@ -71,7 +88,7 @@ export default function Dashboard() {
               <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
                 <dt className="text-sm font-medium text-gray-500">Nom</dt>
                 <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                  {user?.name || 'Non défini'}
+                  {user?.user_metadata?.full_name || user?.user_metadata?.name || 'Non défini'}
                 </dd>
               </div>
               <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
@@ -80,6 +97,24 @@ export default function Dashboard() {
                   {user?.email}
                 </dd>
               </div>
+              <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                <dt className="text-sm font-medium text-gray-500">Méthode de connexion</dt>
+                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                  {user?.app_metadata?.provider || 'Email/Mot de passe'}
+                </dd>
+              </div>
+              {user?.user_metadata?.avatar_url && (
+                <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+                  <dt className="text-sm font-medium text-gray-500">Avatar</dt>
+                  <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                    <img 
+                      src={user.user_metadata.avatar_url} 
+                      alt="Avatar utilisateur" 
+                      className="h-10 w-10 rounded-full"
+                    />
+                  </dd>
+                </div>
+              )}
             </dl>
           </div>
         </div>
