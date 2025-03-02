@@ -1,10 +1,6 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '@/lib/supabase'; // Utilisez le client préconfiguré
 import { cookies } from 'next/headers';
-
-// Initialisation du client Supabase
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 export async function GET() {
   try {
@@ -12,17 +8,8 @@ export async function GET() {
     const cookieStore = cookies();
     const supabaseAuthToken = cookieStore.get('sb-auth-token')?.value;
     
-    // Créer un client Supabase avec le token d'authentification
-    const supabase = createClient(supabaseUrl, supabaseServiceKey, {
-      auth: {
-        persistSession: false
-      }
-    });
-    
     // Déconnecter l'utilisateur dans Supabase
-    if (supabaseAuthToken) {
-      await supabase.auth.admin.signOut(supabaseAuthToken);
-    }
+    await supabase.auth.signOut();
     
     // Créer la réponse
     const response = NextResponse.json({ message: 'Déconnexion réussie' });

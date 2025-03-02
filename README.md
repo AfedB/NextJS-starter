@@ -78,3 +78,70 @@ Data Fetching
 Server Components (par défaut) : fetch() avec options de mise en cache
 Route Handlers : Pour créer des API
 React Server Actions : Formulaires et mutations de données côté serveur
+
+```
+my-app
+├─ jsconfig.json
+├─ middleware.js
+├─ next.config.mjs
+├─ package.json
+├─ pnpm-lock.yaml
+├─ postcss.config.mjs
+├─ prisma
+│  ├─ migrations
+│  │  ├─ 20250226212913_init
+│  │  │  └─ migration.sql
+│  │  ├─ 20250228133612_add_nextauth_models
+│  │  │  └─ migration.sql
+│  │  ├─ 20250301162029_add_updated_at_default
+│  │  │  └─ migration.sql
+│  │  └─ migration_lock.toml
+│  └─ schema.prisma
+├─ prisma.js
+├─ public
+│  ├─ file.svg
+│  ├─ globe.svg
+│  ├─ next.svg
+│  ├─ vercel.svg
+│  └─ window.svg
+├─ README.md
+├─ src
+│  ├─ app
+│  │  ├─ (nav)
+│  │  │  └─ about
+│  │  │     └─ page.js
+│  │  ├─ api
+│  │  │  ├─ auth
+│  │  │  │  ├─ login
+│  │  │  │  │  └─ route.js
+│  │  │  │  ├─ logout
+│  │  │  │  │  └─ route.js
+│  │  │  │  ├─ register
+│  │  │  │  │  └─ route.js
+│  │  │  │  └─ [...nextauth]
+│  │  │  │     └─ route.js
+│  │  │  └─ user
+│  │  │     └─ me
+│  │  │        └─ route.js
+│  │  ├─ components
+│  │  │  ├─ Auth.js
+│  │  │  ├─ AuthLayout.js
+│  │  │  └─ Navbar.js
+│  │  ├─ dashboard
+│  │  │  └─ page.js
+│  │  ├─ favicon.ico
+│  │  ├─ globals.css
+│  │  ├─ layout.js
+│  │  ├─ login
+│  │  │  └─ page.js
+│  │  ├─ page.js
+│  │  └─ register
+│  │     └─ page.js
+│  └─ lib
+│     ├─ auth.js
+│     └─ supabase.js
+├─ tailwind.config.mjs
+├─ testPrisma.js
+└─ vercel.json
+
+```

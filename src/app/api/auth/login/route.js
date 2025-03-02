@@ -1,11 +1,6 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '@/lib/supabase'; // Importez le client déjà configuré
 import { cookies } from 'next/headers';
-
-// Initialisation du client Supabase
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 export async function POST(request) {
   try {
@@ -46,8 +41,6 @@ export async function POST(request) {
     });
     
     // Définition du cookie de session Supabase
-    // Notez que Supabase gère déjà les cookies de session, mais nous pouvons
-    // également définir notre propre cookie si nécessaire
     response.cookies.set({
       name: 'sb-auth-token',
       value: session.access_token,

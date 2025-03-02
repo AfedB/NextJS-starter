@@ -1,10 +1,5 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-
-// Initialisation du client Supabase
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY; // Utilisez la clé de service pour les opérations admin
-const supabase = createClient(supabaseUrl, supabaseServiceKey);
+import { supabase } from '@/lib/supabase'; // Utilisez le client préconfiguré
 
 export async function POST(request) {
   try {
@@ -19,13 +14,16 @@ export async function POST(request) {
     }
 
     // Inscription de l'utilisateur avec Supabase Auth
-    const { data, error } = await supabase.auth.admin.createUser({
+    // Note: la méthode admin.createUser nécessite une clé de service
+    // Si vous n'utilisez pas la clé admin dans lib/supabase.js, utilisez signUp à la place
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
-      user_metadata: {
-        name: name || '',
-      },
-      email_confirm: true, // Option pour confirmer automatiquement l'email
+      options: {
+        data: {
+          name: name || '',
+        },
+      }
     });
 
     if (error) {
