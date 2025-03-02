@@ -1,99 +1,129 @@
-import Image from "next/image";
 import Link from "next/link";
 import { getServerSession } from "next-auth";
 import { authOptions } from "./api/auth/[...nextauth]/route";
+
+// Import des composants shadcn/ui
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Container } from "@/components/ui/container";
+import { Separator } from "@/components/ui/separator";
 
 export default async function Home() {
   const session = await getServerSession(authOptions);
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col justify-center items-center py-12 sm:py-20">
-      <main className="max-w-screen-lg px-4 sm:px-8 text-center">
-        {/* Hero Section */}
-        <section className="mb-12">
-          <h1 className="text-4xl sm:text-6xl font-bold text-gray-900 mb-4">
-            Bienvenue sur notre application !
-          </h1>
-          <p className="text-lg text-gray-600 mb-8">
-            Découvrez une nouvelle façon de gérer votre quotidien.
-            {/* Add a real description of your app !*/}
-          </p>
+    <div className="min-h-screen bg-background">
+      {/* Hero Section */}
+      <section className="w-full py-24 md:py-32 lg:py-40 border-b">
+        <Container>
+          <div className="mx-auto flex max-w-4xl flex-col items-center text-center">
+            <h1 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl">
+              Votre template NextJS personnel
+            </h1>
+            <p className="mt-6 text-lg text-muted-foreground max-w-[42rem]">
+              Une base solide pour tous vos projets. Simple, moderne et hautement personnalisable.
+            </p>
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+              {session ? (
+                <Button asChild size="lg">
+                  <Link href="/dashboard">
+                    Accéder à mon espace
+                  </Link>
+                </Button>
+              ) : (
+                <>
+                  <Button asChild size="lg">
+                    <Link href="/login">
+                      Se connecter
+                    </Link>
+                  </Button>
+                  <Button asChild variant="outline" size="lg">
+                    <Link href="/register">
+                      S'inscrire
+                    </Link>
+                  </Button>
+                </>
+              )}
+            </div>
+          </div>
+        </Container>
+      </section>
 
-          {/* Conditional CTAs based on login status */}
-          {session ? (
-            <Link
-              href="/dashboard"
-              className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-full transition-colors"
-            >
-              Accéder à mon espace
-            </Link>
-          ) : (
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link
-                href="/login"
-                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-full transition-colors"
-              >
-                Se connecter
-              </Link>
-              <Link
-                href="/register"
-                className="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-3 px-6 rounded-full transition-colors"
-              >
-                S'inscrire
-              </Link>
+      {/* Features Section */}
+      {!session && (
+        <section className="w-full py-20">
+          <Container>
+            <div className="mx-auto flex max-w-4xl flex-col items-center text-center mb-12">
+              <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
+                Fonctionnalités clés
+              </h2>
+              <p className="mt-4 text-muted-foreground">
+                Tout ce dont vous avez besoin pour commencer rapidement.
+              </p>
             </div>
-          )}
-        </section>
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-2">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Interface moderne</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground">
+                    Une expérience utilisateur fluide et agréable grâce aux composants shadcn/ui.
+                  </p>
+                </CardContent>
+              </Card>
 
-        {/* Features Section */}
-        {!session && (
-          <section className="grid grid-cols-1 sm:grid-cols-2 gap-8 mb-12">
-            {/* Add real features here! */}
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <h3 className="text-xl font-semibold text-gray-800 mb-2">
-                Fonctionnalité 1
-              </h3>
-              <p className="text-gray-600">
-                Description de la fonctionnalité.
-              </p>
+              <Card>
+                <CardHeader>
+                  <CardTitle>Authentification intégrée</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground">
+                    Système de connexion sécurisé avec NextAuth pour protéger vos données.
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Responsive design</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground">
+                    Une application qui s'adapte parfaitement à tous les appareils.
+                  </p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Personnalisation facile</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground">
+                    Adaptez facilement le design à votre marque et à vos besoins spécifiques.
+                  </p>
+                </CardContent>
+              </Card>
             </div>
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <h3 className="text-xl font-semibold text-gray-800 mb-2">
-                Fonctionnalité 2
-              </h3>
-              <p className="text-gray-600">
-                Description de la fonctionnalité.
-              </p>
-            </div>
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <h3 className="text-xl font-semibold text-gray-800 mb-2">
-                Fonctionnalité 3
-              </h3>
-              <p className="text-gray-600">
-                Description de la fonctionnalité.
-              </p>
-            </div>
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <h3 className="text-xl font-semibold text-gray-800 mb-2">
-                Fonctionnalité 4
-              </h3>
-              <p className="text-gray-600">
-                Description de la fonctionnalité.
-              </p>
-            </div>
-          </section>
-        )}
-        {/* About us Section */}
-        <section className="bg-gray-100 rounded-lg shadow-md p-8 mb-12">
-          <h2 className="text-2xl font-semibold text-gray-800 mb-4">
-            À propos de nous
-          </h2>
-          <p className="text-gray-600">
-            Nous sommes une équipe passionnée qui vise à simplifier votre vie
-            quotidienne.
-          </p>
+          </Container>
         </section>
-      </main>
+      )}
+
+      {/* About Section */}
+      <section className="w-full py-20 bg-muted/50">
+        <Container>
+          <div className="mx-auto max-w-3xl text-center">
+            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
+              À propos
+            </h2>
+            <Separator className="my-4 mx-auto w-24" />
+            <p className="mt-4 text-muted-foreground">
+              Un template personnalisé conçu pour servir de fondation solide à tous vos projets NextJS. Moderne, accessible et prêt à évoluer selon vos besoins.
+            </p>
+          </div>
+        </Container>
+      </section>
     </div>
   );
 }

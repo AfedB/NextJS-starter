@@ -81,6 +81,7 @@ React Server Actions : Formulaires et mutations de données côté serveur
 
 ```
 my-app
+├─ components.json
 ├─ jsconfig.json
 ├─ middleware.js
 ├─ next.config.mjs
@@ -126,7 +127,8 @@ my-app
 │  │  ├─ components
 │  │  │  ├─ Auth.js
 │  │  │  ├─ AuthLayout.js
-│  │  │  └─ Navbar.js
+│  │  │  ├─ Navigation.jsx
+│  │  │  └─ ThemeProvider.jsx
 │  │  ├─ dashboard
 │  │  │  └─ page.js
 │  │  ├─ favicon.ico
@@ -137,11 +139,25 @@ my-app
 │  │  ├─ page.js
 │  │  └─ register
 │  │     └─ page.js
+│  ├─ components
+│  │  └─ ui
+│  │     ├─ alert-dialog.jsx
+│  │     ├─ alert.jsx
+│  │     ├─ button.jsx
+│  │     ├─ card.jsx
+│  │     ├─ container.jsx
+│  │     ├─ form.jsx
+│  │     ├─ input.jsx
+│  │     ├─ label.jsx
+│  │     ├─ navigation-menu.jsx
+│  │     ├─ separator.jsx
+│  │     ├─ sheet.jsx
+│  │     └─ sonner.jsx
 │  └─ lib
 │     ├─ auth.js
-│     └─ supabase.js
+│     ├─ supabase.js
+│     └─ utils.js
 ├─ tailwind.config.mjs
-├─ testPrisma.js
 └─ vercel.json
 
 ```
